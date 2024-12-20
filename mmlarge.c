@@ -18,17 +18,16 @@ int array_equality(int *arr1, int *arr2, int length) {
     return 0;
 }
 
-int array_sum(int *arr1, int *arr2, int length) {
-    int result = 0;
+int array_sum(int *arr1, int *arr2, int* sum, int length) {
     for (int i = 0; i < length; i++) {
-            result = arr1[i] + arr2[2];
+            sum[i] = arr1[i] + arr2[i];
     }
-    return result;
+    return 0;
 }
-int array_product(int *arr1, int *arr2, int length) {
+int array_dot_product(int *arr1, int *arr2, int length) {
     int result = 0;
     for (int i = 0; i < length; i++) {
-            result = result + (arr1[i] * arr2[i]);
+            result = result ^ (arr1[i] * arr2[i]);
     }
     return result;
 }
@@ -122,7 +121,9 @@ void generate_truth_table(int t) {
                 result = v(xx, xx+t, t);
             } else {
                 // Case for the else part
-                result = array_product((xx, yy, k), yy, k);
+                int tempsum[k];
+                array_sum(xx, yy, tempsum, k);
+                array_dot_product(tempsum, yy, k);
             }
 
             // Print the result for the current input pair (xx, yy)
