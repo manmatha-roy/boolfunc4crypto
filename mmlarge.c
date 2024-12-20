@@ -18,6 +18,20 @@ int array_equality(int *arr1, int *arr2, int length) {
     return 0;
 }
 
+int array_sum(int *arr1, int *arr2, int length) {
+    int result = 0;
+    for (int i = 0; i < length; i++) {
+            result = arr1[i] + arr2[2];
+    }
+    return result;
+}
+int array_product(int *arr1, int *arr2, int length) {
+    int result = 0;
+    for (int i = 0; i < length; i++) {
+            result = result + (arr1[i] * arr2[i]);
+    }
+    return result;
+}
 int is_filled_with(int *arr, int length, int v){
     for (int i = 0; i < length; i++) {
         if(arr[i] != v)
@@ -86,30 +100,29 @@ int v(int *zz, int *rr, int t) {
 // Main function to generate the truth table for f(xx, yy)
 void generate_truth_table(int t) {
     int n = 4 * t;
-    int k = 2*t;  // The number of variables
-    int size = 1 << n;  // Total number of combinations (2^4t)
+    int k = 2 * t;  // The number of variables on each half
+    int size = 1 << k;  // Total number of combinations on each half (2^2t)
     
     // Allocate memory for input vectors
-    int xx[2*t], yy[2*t];
+    int xx[k], yy[k];
 
     // Generate the truth table
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            // Fill xx and yy arrays based on i and j
-            for (int m = 0; m < 2*t; m++) {
-                xx[m] = (i >> m) & 1;
-                yy[m] = (j >> m) & 1;
+            for (int z = 0; z < k; z++) {
+                xx[k] = (i >> z) & 1;
+                yy[k] = (j >> z) & 1;
             }
 
             // Determine which case of the function to compute
             int result = 0;
-            if (is_filled_with(xx, 2*t, 1) == 0 && array_equality(xx, yy, t) == 1) {
-                result = u(yy, yy, t);
-            } else if (xor_array(yy, t) == xor_array(xx, t)) {
-                result = v(xx, yy, t);
+            if (is_filled_with(xx, k, 1) == 0 && array_equality(xx, yy, k) == 1) {
+                result = u(yy, yy+t, t);
+            } else if (array_equality(xx, yy, k) == 0) {
+                result = v(xx, xx+t, t);
             } else {
                 // Case for the else part
-                result = xor_array(xx, t) ^ xor_array(yy, t);
+                result = array_product((xx, yy, k), yy, k);
             }
 
             // Print the result for the current input pair (xx, yy)
@@ -124,10 +137,10 @@ int main() {
     printf("Enter the value of t: ");
     scanf("%d", &t);
 
-    if (t >= 5) {
+    if (t >= 3) {
         generate_truth_table(t);
     } else {
-        printf("t must be greater than or equal to 5.\n");
+        printf("t must be greater than or equal to 3.\n");
     }
 
     return 0;
