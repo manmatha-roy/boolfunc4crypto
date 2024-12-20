@@ -10,22 +10,6 @@ int xor_array(int *arr, int length) {
     return result;
 }
 
-int array_equality(int *arr1, int *arr2, int length) {
-    for (int i = 0; i < length; i++) {
-        if(arr1[i] != arr2[i])
-            return 1;
-    }
-    return 0;
-}
-
-int is_filled_with(int *arr, int length, int v){
-    for (int i = 0; i < length; i++) {
-        if(arr[i] != v)
-            return 1;
-    }
-    return 0;
-}
-
 // Function g(rr) from Definition D:subsubfunc
 int g(int *rr, int t) {
     int iota = (t - 1) / 2;
@@ -37,7 +21,7 @@ int g(int *rr, int t) {
     }
 
     // Second part: XOR from i = 2iota+1 to t
-    for (int i = 2*iota; i < t; i++) {
+    for (int i = iota; i < t; i++) {
         result ^= rr[i];
     }
 
@@ -55,8 +39,7 @@ int p(int *zz, int *rr, int t) {
 
 // Function q(zz, rr) from Definition D:bents
 int q(int *zz, int *rr, int t) {
-
-    if(is_filled_with(zz,t, 0)==0) {
+    if (zz[0] == 0) {
         return g(rr, t);
     } else {
         int result = 0;
@@ -73,37 +56,36 @@ int q(int *zz, int *rr, int t) {
 int u(int *zz, int *rr, int t) {
     int p_value = p(zz, rr, t);
     int q_value = q(zz, rr, t);
-    return p_value * q_value;
+    return p_value ^ q_value;
 }
 
 // Function v(zz, rr) from Definition D:subfunction
 int v(int *zz, int *rr, int t) {
     int p_value = p(zz, rr, t);
     int q_value = q(zz, rr, t);
-    return (p_value ^ 1) * q_value ;
+    return (p_value ^ 1) * q_value ^ u(zz, rr, t) ^ q_value;
 }
 
 // Main function to generate the truth table for f(xx, yy)
 void generate_truth_table(int t) {
-    int n = 4 * t;
-    int k = 2*t;  // The number of variables
+    int n = 4 * t;  // The number of variables
     int size = 1 << n;  // Total number of combinations (2^4t)
     
     // Allocate memory for input vectors
-    int xx[2*t], yy[2*t];
+    int xx[t], yy[t];
 
     // Generate the truth table
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             // Fill xx and yy arrays based on i and j
-            for (int m = 0; m < 2*t; m++) {
-                xx[m] = (i >> m) & 1;
-                yy[m] = (j >> m) & 1;
+            for (int k = 0; k < t; k++) {
+                xx[k] = (i >> k) & 1;
+                yy[k] = (j >> k) & 1;
             }
 
             // Determine which case of the function to compute
             int result = 0;
-            if (is_filled_with(xx, 2*t, 1) == 0 && array_equality(xx, yy, t) == 1) {
+            if (xor_array(xx, t) == 1 && xor_array(yy, t) != 1) {
                 result = u(yy, yy, t);
             } else if (xor_array(yy, t) == xor_array(xx, t)) {
                 result = v(xx, yy, t);
